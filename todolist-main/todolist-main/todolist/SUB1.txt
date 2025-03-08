@@ -1,0 +1,1116 @@
+java.lang package consists of:
+--------------------------------
+	Object (root class of all java classes)
+		public boolean equals(Object o) {}
+		public String toString() {}
+		public int hashCode() {}
+		public Object clone() {} deep cloning/shallow cloning
+		public void finalize() {}
+		public void wait()	 {}
+		public void wait(long ms)	 {}
+		public void wait(long ms, int nanosecs)	 {}
+		public void notify() {}
+		public void notifyAll() {}
+
+	System
+	Runtime
+	Class
+	ClassLoader	
+	Math
+	Process
+	ProcessBuilder
+
+	wrapper classes: (types conversion classes)
+		Number
+			Byte
+			Short
+			Integer
+			Long
+			Float
+			Double
+		Character	
+		Boolean
+	String
+	StringBuffer
+	StringBuilder
+	
+	Throwable
+		Error
+		Exception (sub classes are called as CheckedExceptions)
+			InterruptedException
+			RuntimeException (sub classes are called as UncheckedException)
+				ArithmeticExcepton
+				ArrayIndexOutOfBoundsException
+				NullPointerException
+				NumberFormatException
+				IllegalArgumentException
+	
+	Runnable (interface)
+	Thread
+	ThreadGroup
+	
+	Comparable (interface) used in natural sorting
+	Cloneable (interface)
+	Iterable (interface) Collection interface super interface
+		
+java.util package consists of:
+--------------------------------
+Legacy classes:
+	Vector
+		Stack
+	Dictionary (ac)
+		Hashtable
+			Properties
+	Enumeration
+
+Collection classes:
+	Iterable (i)
+		Collection (i)
+			List(i)
+				ArrayList
+				LinkedList
+			Set(i)
+				HashSet (Unordered unique collection)
+				LinkedHashSet (Given order, unique collection)
+				TreeSet (Natural order, unique collection)
+		Map(i) part of collection API but not under Collection heirarchy
+				   maintains key-value pairs
+			HashMap (unordered)
+			LinkedHashMap (given ordered keys)
+			TreeMap (natural oredered keys) 
+
+Misc classes:
+	Scanner - to read various types from STDIN/keyboard
+	StingTokenizer (divide String into tokens
+	Date
+	GregorianCalendar
+	Timer (Scheduler)
+	TimerTask
+	Locale (I18N- InternationalizatioN)
+	ResourceBundle
+
+java.io package consists of:
+InputStream class reads stream of bytes (ASCII range chars)
+OutputStream class writes stream of bytes (ASCII range chars)
+Reader class reads stream of characters ((Unicode range chars)
+Writer class writes stream of characters ((Unicode range chars)
+
+InputStream
+	FileInputStream
+	ByteArrayInputStream
+	StringBufferInputStream
+	FilteredInputStream
+		DataInputStream (reads line-line, int, long, float, double)
+		BufferedInputStream (reads buffer-buffer 1kb/2kb/1mb/2mb)
+		LineNumerInputStream
+
+OutputStream
+	FileOutputStream
+	ByteArrayOutputStream
+	FilteredOutputStream
+		DataOutputStream
+		BufferedOutputStream
+		
+Reader
+	FileReader
+	BufferedReader
+	CharArrayReader
+	InputStreamReader
+
+Writer
+	FileWriter
+	BufferedWriter
+	CharArrayWriter
+	InputStreamWriter
+  
+RandomAccessFile
+Serializable (i)
+
+java.net package consists of:
+--------------------------------
+URL
+URLConnection
+HttpURLConnection
+InetAddress
+Socket
+ServerSocket
+DatagramSocket
+DatagramPacket
+
+java.sql package consists of:
+-------------------------------
+interfaces:
+	Driver
+	Connection
+	Statement
+	PreparedStatement
+	CallableStatement
+	ResultSet
+	DatabaseMetaData
+	ResultSetMetaData
+	
+classes:
+	DriverManager
+	Types
+	SQLException
+
+
+Java Programming Structure:
+===================
+OOPs features:
+==========
+Encapsulation
+Abstraction
+Inheritance
+Polymorphism
+Message Passing (Pass-by-value, Pass-by-reference)
+
+Encapsulation:
+----------------
+Protects the member variables of the class from outside access. Hindes variables.
+
+// Book.java
+public class Book {
+	private String title;
+	private String author;
+	private int year;
+	
+	// no parameter constructor
+	public Book() {}
+	// parameterized constructor
+	public Book(String title, String author, int year) {
+		this.title=title;
+		this.author=author;
+		this.year=year;
+	}
+	// write one pair of setter and getter method for each variable
+	public void setTitle(String title) {
+		this.title=title;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setAuthor(String author) {
+		this.author=author;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setYear(int year) {
+		this.year=year;
+	}
+	public int getYear() {
+		return year;
+	}
+	// override equals(), toString(), hashCode() methods of Object class
+	public String toString() {
+		return title+" "+author+" "+year;
+	}
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	public boolean equals(Object o) {
+		boolean flag=false;
+		if(o instanceof Book) {
+			Book b1=(Book)o;
+			if(this.title.equals(b1.getTitle()) && this.author.equals(b1.getAuthor()) && this.year==b1.getYear()) {
+				flag=true;
+			}
+		}
+		return flag;
+	}
+}
+
+Types of classes in java:
+interface, abstract class, class, final class, inner class, anonymous class, enum
+
+Writing BookService as interface
+- all interface variables are public static final by default
+	- hence interface variables must be intialized at the time of declaration
+- all interface methods are public and abstract by default
+- interface must be only inherited
+- interface cannot be instantiated
+- no constructors exist in interface
+
+// BookService.java
+import java.util.*;
+public abstract interface BookService {
+	public abstract boolean addBook(String title, String author, int year);
+	public abstract boolean updateBook(String title, String author, int year);
+	public abstract boolean deleteBook(String title);
+	public abstract List<Book> findAllBooks();
+	public abstract Book findBookByTitle(String title);
+	public abstract List<Book> findBooksByAuthor(String author);
+	public abstract List<Book> findBooksByYear(int year);
+}
+
+// BookServiceImpl.java
+import java.util.*;
+public class BookServiceImpl implements BookService {
+	List<Book> bookList;
+	public BookServiceImpl() {
+		bookList=new ArrayList<Book>();
+	}
+	public boolean addBook(String title, String author, int year) {
+		Book b=new Book(title, author, year);
+		return bookList.add(b);
+	}
+	public boolean updateBook(String title, String author, int year) {
+		boolean flag=false;
+		for(Book book:bookList) {
+			if(book.getTitle().equals(title)) {
+				flag=bookList.remove(book);
+				Book book1=new Book(title, author, year);
+				bookList.add(book1);
+				break;
+			}
+		}
+		return flag;
+	}
+	public boolean deleteBook(String title) {
+		boolean flag=false;
+		for(Book book:bookList) {
+			if(book.getTitle().equals(title)) {
+				flag=bookList.remove(book);
+				break;
+			}
+		}
+		return flag;
+	}
+	public List<Book> findAllBooks() {
+		return bookList;
+	}
+	public Book findBookByTitle(String title) {
+		Book b=null;
+		for(Book b1:bookList) {
+			if(title.equals(b1.getTitle())) {
+				b=b1;
+				break;
+			}
+		}
+		return b;
+	}
+	public List<Book> findBooksByAuthor(String author) {
+		List<Book> selectedBooks=new ArrayList<Book>();
+		for(Book b:bookList) {
+			if(author.equals(b.getAuthor())) {
+				selectedBooks.add(b);
+			}
+		}
+		return selectedBooks;
+	}
+	public List<Book> findBooksByYear(int year) {
+		List<Book> subList=new ArrayList<Book>();
+		for(Book book:bookList) {
+			if(book.getYear()==year) {
+				subList.add(book);
+			}
+		}
+		return subList;
+	}
+}
+
+// BookClient.java
+import java.util.*;
+class BookClient {
+	public static void main(String rags[]) {
+		BookService bs=new BookServiceImpl();
+		boolean flag=bs.addBook("Java Complete Reference", "Patrick Norton", 2001);
+		if(flag)
+			System.out.println("Book added");
+		flag=bs.addBook("Thinking in Java", "Bruce Eckel", 2001);
+		if(flag)
+			System.out.println("Book added");
+		flag=bs.addBook("How to Java", "Dietel & Dietel", 2003);
+		if(flag)
+			System.out.println("Book added");
+		System.out.println("**********************************");
+		List<Book> books=bs.findAllBooks();
+		System.out.println(books);
+		System.out.println("**********************************");
+		for(Book book:books) {
+			System.out.println(book);
+		}
+		System.out.println("**********************************");
+		Book book1=bs.findBookByTitle("Java Complete Reference");
+		System.out.println(book1);
+		System.out.println("**********************************");
+		books=bs.findBooksByYear(2001);
+		for(Book book2:books) {
+			System.out.println(book2);
+		}
+	}
+}
+
+Dynamic Java Web Application:
+-----------------------------------
+ToDo List Application:
+Create a web project
+Name: sub1_todo
+	src
+		main
+			java
+				beans
+					Register.java
+					Task.java
+				dao	
+					ToDoDAO.java
+					ToDoDAOImpl.java
+				factory
+					DBConn.java
+				servlets
+					LoginServlet.java
+					LogoutServlet.java
+					RegisterServlet.java
+					AddTaskServlet.java
+					TaskCompletedServlet.java
+			webapp
+				WEB-INF
+					web.xml
+				Login.jsp
+				Register.html
+				ViewTasks.jsp
+
+In the beans	 package:
+// Register.java
+package beans;
+import java.util.List;
+public class Register {
+	private int regid;
+	private String fname;
+	private String lname;
+	private String email;
+	private  String pass;
+	private long mobile;
+	private String address;
+	private List<Task> taskList;
+	
+	public Register() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Register(int regid, String fname, String lname, String email, String pass, long mobile, String address,
+			List<Task> taskList) {
+		super();
+		this.regid = regid;
+		this.fname = fname;
+		this.lname = lname;
+		this.email = email;
+		this.pass = pass;
+		this.mobile = mobile;
+		this.address = address;
+		this.taskList = taskList;
+	}
+	
+	public int getRegid() {
+		return regid;
+	}
+
+	public void setRegid(int regid) {
+		this.regid = regid;
+	}
+
+	public String getFname() {
+		return fname;
+	}
+
+	public void setFname(String fname) {
+		this.fname = fname;
+	}
+
+	public String getLname() {
+		return lname;
+	}
+
+	public void setLname(String lname) {
+		this.lname = lname;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPass() {
+		return pass;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+	public long getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(long mobile) {
+		this.mobile = mobile;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public List<Task> getTaskList() {
+		return taskList;
+	}
+
+	public void setTaskList(List<Task> taskList) {
+		this.taskList = taskList;
+	}
+
+	@Override
+	public String toString() {
+		return "Register [regid=" + regid + ", fname=" + fname + ", lname=" + lname + ", email=" + email + ", pass="
+				+ pass + ", mobile=" + mobile + ", address=" + address + "]";
+	}
+	@Override
+	public int hashCode() {
+		return toString().hashCode();
+	}
+	@Override
+	public boolean equals(Object obj) {
+		return true;
+	}
+}
+
+// Task.java
+package beans;
+
+import java.util.Objects;
+
+public class Task {
+
+	private int taskid;
+	private String taskName;
+	private String taskDate;
+	private int taskStatus;
+	private int regid;
+	public Task() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Task(int taskid, String taskName, String taskDate, int taskStatus, int regid) {
+		super();
+		this.taskid = taskid;
+		this.taskName = taskName;
+		this.taskDate = taskDate;
+		this.taskStatus = taskStatus;
+		this.regid = regid;
+	}
+	public int getTaskid() {
+		return taskid;
+	}
+	public void setTaskid(int taskid) {
+		this.taskid = taskid;
+	}
+	public String getTaskName() {
+		return taskName;
+	}
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
+	public String getTaskDate() {
+		return taskDate;
+	}
+	public void setTaskDate(String taskDate) {
+		this.taskDate = taskDate;
+	}
+	public int getTaskStatus() {
+		return taskStatus;
+	}
+	public void setTaskStatus(int taskStatus) {
+		this.taskStatus = taskStatus;
+	}
+	public int getRegid() {
+		return regid;
+	}
+	public void setRegid(int regid) {
+		this.regid = regid;
+	}
+	@Override
+	public String toString() {
+		return "Task [taskid=" + taskid + ", taskName=" + taskName + ", taskDate=" + taskDate + ", taskStatus="
+				+ taskStatus + ", regid=" + regid + "]";
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(regid, taskDate, taskName, taskStatus, taskid);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		return true;
+	}
+	
+	
+}
+
+// DBConn.java
+package factory;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBConn {
+
+	static Connection con;
+	
+	public static Connection getConn() {
+		try {
+			if(con==null) {
+				/*Class.forName("com.mysql.jdbc.Driver");
+				con=DriverManager.getConnection("jdbc:mysql://localhost:3306/sub1", "root", "");*/
+				Class.forName("oracle.jdbc.driver.OracleDriver");
+				con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "sub1", "sub1");
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return con;
+	}
+}
+
+// ToDoDAO.java
+package dao;
+
+import java.util.List;
+
+import beans.Register;
+import beans.Task;
+
+public interface ToDoDAO {
+
+	public abstract int register(Register register);
+	public abstract int login(String email, String pass);
+	public abstract boolean addTask(Task task, int regid);
+	public abstract List<Task> findAllTasks(int regid);
+	public abstract boolean markTaskCompleted(int taskid, int regid);
+
+}
+
+// ToDoDAOImpl.java
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import beans.Register;
+import beans.Task;
+import factory.DBConn;
+
+public class ToDoDAOImpl implements ToDoDAO {
+
+	Connection con;
+	Statement stmt;
+	PreparedStatement pstmt1, pstmt2, pstmt3, pstmt4, pstmt5;
+	ResultSet rs;
+	
+	public ToDoDAOImpl() {
+		try {
+			con=DBConn.getConn();
+			stmt=con.createStatement();
+			pstmt1=con.prepareStatement("INSERT INTO register VALUES (?,?,?,?,?,?,?)");
+			pstmt2=con.prepareStatement("INSERT INTO tasks VALUES (?,?,?,?,?)");
+			pstmt3=con.prepareStatement("INSERT INTO taskid_pks VALUES (?,?)");
+			pstmt4=con.prepareStatement("UPDATE taskid_pks SET taskid=? WHERE regid=?");
+			pstmt5=con.prepareStatement("UPDATE tasks SET taskstatus=? WHERE regid=? AND taskid=?");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public int register(Register register) {
+		int regid=0;
+		try {
+			// pk generation
+			rs=stmt.executeQuery("SELECT max(regid) FROM register");
+			if(rs.next()) {
+				regid=rs.getInt(1);
+			}
+			regid++;
+			
+			pstmt1.setInt(1, regid);
+			pstmt1.setString(2, register.getFname());
+			pstmt1.setString(3, register.getLname());
+			pstmt1.setString(4, register.getEmail());
+			pstmt1.setString(5, register.getPass());
+			pstmt1.setLong(6, register.getMobile());
+			pstmt1.setString(7, register.getAddress());
+			int i=pstmt1.executeUpdate();
+			if(i==1) 
+				System.out.println("record inserted into register table");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return regid;
+	}
+
+	@Override
+	public int login(String email, String pass) {
+		int regid=0;
+		try {
+			rs=stmt.executeQuery("select regid from register where email='"+email+"' and pass='"+pass+"'");
+			if(rs.next()) {
+				regid=rs.getInt(1);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return regid;
+	}
+
+	@Override
+	public boolean addTask(Task task, int regid) {
+		boolean flag=false; boolean isNew=true; int i,j=0; int taskid=0;
+		try {
+			rs=stmt.executeQuery("select taskid from taskid_pks where regid="+regid);
+			if(rs.next()) {
+				taskid=rs.getInt(1);
+				isNew=false;
+			}
+			taskid++;
+			con.setAutoCommit(false);
+			pstmt2.setInt(1, taskid);
+			pstmt2.setString(2, task.getTaskName());
+			pstmt2.setString(3,  task.getTaskDate());
+			pstmt2.setInt(4,task.getTaskStatus());
+			pstmt2.setInt(5, task.getRegid());
+			i=pstmt2.executeUpdate();
+			if(isNew) {
+				pstmt3.setInt(1, regid);
+				pstmt3.setInt(2, taskid);
+				j=pstmt3.executeUpdate();
+			} else {
+				pstmt4.setInt(1, taskid);
+				pstmt4.setInt(2, regid);
+				j=pstmt4.executeUpdate();
+			}
+			if(i==1 && j==1) {
+				con.commit(); flag=true;
+				System.out.println("Task inserted");
+			} else {
+				con.rollback(); flag=false;
+				System.out.println("TX insertion failed");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public List<Task> findAllTasks(int regid) {
+		List<Task> taskList=new ArrayList<Task>();
+		try {
+			rs=stmt.executeQuery("select * from tasks where regid="+regid);
+			while(rs.next()) {
+				Task task=new Task(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5));
+				taskList.add(task);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return taskList;
+	}
+
+	@Override
+	public boolean markTaskCompleted(int taskid, int regid) {
+		boolean flag=false;
+		try {
+			pstmt5.setInt(1, 3); // taskstatus 3 is completed
+			pstmt5.setInt(2, regid);
+			pstmt5.setInt(3, taskid);
+			int i=pstmt5.executeUpdate();
+			if(i==1)
+				System.out.println(taskid+" task marked completed");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return flag;
+	}
+}
+
+WEB-INF\web.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>sub1_todo</display-name>
+  <welcome-file-list>
+    <welcome-file>Register.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+  </welcome-file-list>
+</web-app>
+
+<!-- Register.html -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Register</title>
+</head>
+<body>
+	<form method="post" action="./RegisterServlet">
+		<table align="center" width="30%">
+			<tr>
+				<th>FName</th>
+				<td><input type="text" name="fname"></td>
+			</tr>
+			<tr>
+				<th>LName</th>
+				<td><input type="text" name="lname"></td>
+			</tr>
+			<tr>
+				<th>Email</th>
+				<td><input type="text" name="email"></td>
+			</tr>
+			<tr>
+				<th>Pass</th>
+				<td><input type="password" name="pass"></td>
+			</tr>
+			<tr>
+				<th>Mobile</th>
+				<td><input type="text" name="mobile"></td>
+			</tr>
+			<tr>
+				<th>Address</th>
+				<td>
+					<textarea name="address" rows="10" cols="21">
+					</textarea>
+				</td>
+			</tr>
+			<td>
+				<th><input type="submit" name="submit" value="Register"></th>
+				<th><input type="reset" name="reset" value="Clear"></th>
+			</td>
+		</table>
+	</form>
+	<p align="center"><a href="Login.jsp">Login</a></p>
+</body>
+</html>
+
+// RegisterServlet.java
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import beans.Register;
+import dao.ToDoDAO;
+import dao.ToDoDAOImpl;
+
+
+@WebServlet("/RegisterServlet")
+public class RegisterServlet extends HttpServlet {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html");
+		PrintWriter out=response.getWriter();
+		String fname=request.getParameter("fname").trim();
+		String lname=request.getParameter("lname").trim();
+		String email=request.getParameter("email").trim();
+		String pass=request.getParameter("pass").trim();
+		long mobile=Long.parseLong(request.getParameter("mobile").trim());
+		String address=request.getParameter("address").trim();
+		Register register=new Register(0, fname, lname, email, pass, mobile, address, null);
+		ToDoDAO dao=new ToDoDAOImpl();
+		int regid=dao.register(register);
+		if(regid>0)
+			response.sendRedirect("./Login.html");
+		else
+			out.println("Registration failed");
+	}
+}
+
+Login.jsp
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Login</title>
+</head>
+<body>
+	<%
+		Object o=request.getAttribute("loginError");
+		String error=(o==null)?"":o.toString();
+	%>
+	<p align="center" style="color:red;"><b><%=error%></b></p>
+	<form method="post" action="./LoginServlet">
+		<table border="1" width="25%" align="center">
+			<tr>
+				<th>Email</th>
+				<td><input type="text" name="email" value=""></td>
+			</tr>
+			<tr>
+				<th>Pass</th>
+				<td><input type="password" name="pass" value=""></td>
+			</tr>
+			<tr>
+				<th><input type="submit" name="submit" value="Login"></th>
+				<td><input type="reset" name="reset" value="Clear"></td>
+			</tr>
+		</table>
+	</form>
+	<P align="center"><A href="./Register.html">Register</A></P>
+</body>
+</html>
+
+// LoginServlet.java
+package servlets;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.ToDoDAO;
+import dao.ToDoDAOImpl;
+
+@WebServlet("/LoginServlet")
+public class LoginServlet extends HttpServlet {
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html");
+		PrintWriter out=response.getWriter();
+		HttpSession session=request.getSession();
+		ServletContext context=getServletContext();
+		
+		String email=request.getParameter("email").trim();
+		String pass=request.getParameter("pass").trim();
+		
+		ToDoDAO dao=new ToDoDAOImpl();
+		int regid=dao.login(email, pass);
+		if(regid==0) {
+			// out.println("Login Failed");
+			request.setAttribute("loginError", "Invalid Email / Pass ");
+			context.getRequestDispatcher("/Login.jsp").forward(request, response);
+			
+		} else {
+			session.setAttribute("email" , email);
+			session.setAttribute("regid", regid);
+		
+			context.getRequestDispatcher("/ViewTasks.jsp").forward(request, response);
+		}	
+	}
+}
+
+ViewTasks.jsp
+<%@page import="beans.Task"%>
+<%@page import="java.util.List"%>
+<%@page import="dao.ToDoDAO"%>
+<%@page import="dao.ToDoDAOImpl"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>ToDo List</title>
+</head>
+<body>
+	<p align="right">Welcome <b style='color:red'><%=session.getAttribute("email")%></b></p>
+	<form method="post" action="./AddTaskServlet">
+		<table align="center" width="30%" border="1">
+			<tr>
+				<th>TaskName</th>
+				<td><input type="text" name="taskName"></td>
+			</tr>
+			<tr>
+				<th>TaskDate</th>
+				<td><input type="text" name="taskDate" placeholder="dd-mm-yyyy"></td>
+			</tr>
+			<tr>
+				<th>TaskStatus</th>
+				<td>
+					<select name="taskStatus">
+						<option value="1">Not Yet Started</option>
+						<option value="2">Pending</option>
+						<option value="3">Completed</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th><input type="submit" name="submit" value="Add Task"></th>
+				<td><input type="reset" name="reset" value="Clear"></td>
+			</tr>			
+		</table>
+	</form>
+	<br/>
+	<hr width="50%" border="1"/>
+	<%
+		String email=session.getAttribute("email").toString();
+		int regid=((Integer)session.getAttribute("regid")).intValue();
+		ToDoDAO dao=new ToDoDAOImpl();
+		List<Task> taskList=dao.findAllTasks(regid);
+	%>
+	<table align="center" width="50%" border="1">
+		<tr>
+			<th>Task ID</th>
+			<th>Task Name</th>
+			<th>Task Date</th>
+			<th>Task Status</th>
+		</tr>
+		<%
+			for(Task task:taskList) {
+				int status=task.getTaskStatus();
+				if(status==3) {
+		%>
+		<strike>
+			<tr>
+				
+					<td><strike><%=task.getTaskid()%></strike></td>
+					<td><strike><%=task.getTaskName()%></strike></td>
+					<td><strike><%=task.getTaskDate()%></strike></td>
+					<td><strike>Completed</strike>
+					</td>
+				
+			</tr>
+			<%
+				} else {
+			%>
+			<tr>
+					<td><%=task.getTaskid()%></td>
+					<td><%=task.getTaskName()%></td>
+					<td><%=task.getTaskDate()%></td>
+					<td><a href='./TaskCompletedServlet?taskid=<%=task.getTaskid()%>'><font color='red'>Complete</font></a>
+					</td>
+			</tr>			
+			<%	
+				}
+			}
+			%>
+	</table>
+	<p align="center"><a href="./LogoutServlet">Logout</a></p>
+	
+</body>
+</html>
+
+// AddTaskServlet.java
+package servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import beans.Task;
+import dao.ToDoDAOImpl;
+
+
+@WebServlet("/AddTaskServlet")
+public class AddTaskServlet extends HttpServlet {
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletContext context=getServletContext();
+		HttpSession session=request.getSession();
+		String taskName=request.getParameter("taskName").trim();
+		String taskDate=request.getParameter("taskDate").trim();
+		int taskStatus=Integer.parseInt(request.getParameter("taskStatus").trim());
+		int regid=((Integer)session.getAttribute("regid")).intValue();
+		Task task=new Task(0, taskName, taskDate, taskStatus, regid);
+		boolean flag=new ToDoDAOImpl().addTask(task, regid);
+		if(flag) {
+			context.getRequestDispatcher("/ViewTasks.jsp").forward(request, response);
+		}
+	}
+}
+
+// TaskCompletedServlet.java
+package servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import dao.ToDoDAO;
+import dao.ToDoDAOImpl;
+
+
+@WebServlet("/TaskCompletedServlet")
+public class TaskCompletedServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    
+    
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html");
+		HttpSession session=request.getSession();
+		ServletContext context=getServletContext();
+		
+		int taskid=Integer.parseInt(request.getParameter("taskid"));
+		int regid=((Integer)session.getAttribute("regid")).intValue();
+		ToDoDAO dao=new ToDoDAOImpl();
+		dao.markTaskCompleted(taskid, regid);
+		context.getRequestDispatcher("/ViewTasks.jsp").forward(request, response);
+	}
+
+}
+
+// LogoutServlet.java
+package servlets;
+
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+@WebServlet("/LogoutServlet")
+public class LogoutServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		ServletContext context=getServletContext();
+		HttpSession session=request.getSession();
+		session.invalidate();
+		context.getRequestDispatcher("/Login.jsp").forward(request, response);
+	}
+}
+
+
